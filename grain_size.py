@@ -1,3 +1,4 @@
+import struct
 import cv2 as cv
 import numpy as np 
 
@@ -30,4 +31,12 @@ cv.imshow("Eroded Image" , erode)
 dilate = cv.dilate(thresh,kernel,iterations=1)
 cv.imshow("Dilated Image" , erode)
 
+#Masking the Image
+mask = dilate==255
+
+s = [[1,1,1],[1,1,1],[1,1,1]]
+label_mask , num_labels = ndimage.label(mask , structure=s)
+
+i_new = color.lab2rgb(label_mask , bg_label=0)
+cv.imshow("ierhv",i_new)
 cv.waitKey(0)
