@@ -32,11 +32,25 @@ dilate = cv.dilate(thresh,kernel,iterations=1)
 cv.imshow("Dilated Image" , erode)
 
 #Masking the Image
+#We need a binary image. The thresholded image is binary as it contains values which are either 0 or 255 but for the compiler, its datatype is unit8
+#mask would create a binary image with datatype bool
 mask = dilate==255
 
-s = [[1,1,1],[1,1,1],[1,1,1]]
-label_mask , num_labels = ndimage.label(mask , structure=s)
 
-i_new = color.lab2rgb(label_mask , bg_label=0)
-cv.imshow("ierhv",i_new)
+s = [[1,1,1],[1,1,1],[1,1,1]] 
+label_mask , num_labels = ndimage.label(mask , structure=s)
+img2 = color.label2rgb(label_mask , bg_label=0)
+cv.imshow("colored",img2)
+
+print()
+clusters = measure.regionprops(label_mask , img)
+
+
+List = ['Area' , 'Equivalent Diameter' , 'Orientation' , 'MajorAxisLength' , 'MinorAxisLength' , 'Perimeter' , 'Minimum Intensity' , 'Mean Intensity' , 'Max I']
+
+output_file = open('Image-Data.csv' , 'w')
+output_file.write(","+",".join(List)+"\n")
+
+print(clusters[1].area**pix_to_um_ratio)
+
 cv.waitKey(0)
