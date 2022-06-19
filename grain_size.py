@@ -45,12 +45,35 @@ cv.imshow("colored",img2)
 print()
 clusters = measure.regionprops(label_mask , img)
 
+propList = ['Area',
+            'equivalent_diameter', 
+            'orientation',
+            'MajorAxisLength',
+            'MinorAxisLength',
+            'Perimeter',
+            'MinIntensity',
+            'MeanIntensity',
+            'MaxIntensity']    
+    
 
-List = ['Area' , 'Equivalent Diameter' , 'Orientation' , 'MajorAxisLength' , 'MinorAxisLength' , 'Perimeter' , 'Minimum Intensity' , 'Mean Intensity' , 'Max I']
+output_file = open('image_measurements.csv', 'w')
+output_file.write(',' + ",".join(propList) + '\n') #join strings in array by commas, leave first cell blank
+#First cell blank to leave room for header (column names)
 
-output_file = open('Image-Data.csv' , 'w')
-output_file.write(","+",".join(List)+"\n")
-
-print(clusters[1].area**pix_to_um_ratio)
+for cluster_props in clusters:
+    #output cluster properties to the excel file
+    output_file.write(str(cluster_props['Label']))
+    for i,prop in enumerate(propList):
+        if(prop == 'Area'): 
+            to_print = cluster_props[prop]*pix_to_um_ratio**2   #Convert pixel square to um square
+        elif(prop == 'orientation'): 
+            to_print = cluster_props[prop]*57.2958  #Convert to degrees from radians
+        elif(prop.find('Intensity') < 0):          # Any prop without Intensity in its name
+            to_print = cluster_props[prop]*pix_to_um_ratio
+        else: 
+            to_print = cluster_props[prop]     #Reamining props, basically the ones with Intensity in its name
+        output_file.write(',' + str(to_print))
+    output_file.write('\n')
+output_file.close()   #Closes the file, otherwise it would be read only. 
 
 cv.waitKey(0)
